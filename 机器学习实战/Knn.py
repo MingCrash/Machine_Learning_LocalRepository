@@ -3,17 +3,18 @@
 
 import numpy as np
 from Sorting import QuickSort
+from numpy import mat
 # from matplotlib import pyplot
 
 testdata = [172,42]
 
 def createDataSet():
-    group = [[179,42],
-             [178,43],
-             [165,36],
-             [177,42],
-             [160,35],
-             [168,41]]
+    group = [[179,42,140],
+             [178,43,145],
+             [165,36,90],
+             [177,42,135],
+             [160,35,100],
+             [168,41,118]]
     label = ['M','M','F','M','F','M']
     return np.mat(group),label
 
@@ -39,6 +40,7 @@ def Z_ScoreNormalization(gp):
 def dist (vec1,vec2):
     return np.sqrt(np.sum(np.square(vec1-vec2),axis=1))
 
+
 def knn_classify(inx,dataset,label,k):
     dataset_size = dataset.shape[0]
     # dataset = np.insert(arr=dataset,obj=0,values=inx,axis=0)
@@ -46,15 +48,18 @@ def knn_classify(inx,dataset,label,k):
     nrmgp_tmp = MinMaxNormalization(dataset)
     nrmInx = np.tile(nrmgp_tmp[-1],(dataset_size,1))
     nrmgp = np.delete(arr=nrmgp_tmp,obj=-1,axis=0)
-    distSet = dist(nrmInx,nrmgp)
-    return distSet
-    # QuickSort().startQuickSort(rsu)
+    sortedDistIndicies = dist(nrmInx,nrmgp).argsort(axis=0).tolist()  #argsort()返回输入数组由小到大数值的indx
+    count = {}
+    for i in range(k):
+        voteLabel = label[sortedDistIndicies[i][0]]
+        count[voteLabel] = count.get(voteLabel,0) + 1
+    return count
 
-# plt.scatter(nrmgp)
-# plt.show()
+    # return dist(nrmInx,nrmgp),sortedDistIndicies
+
 
 gp,lb = createDataSet()
-print(knn_classify(inx=[[170,40]],dataset=gp,label=lb,k=3))
+print(knn_classify(inx=[[160,36,93]],dataset=gp,label=lb,k=2))
 
 # aa = np.array([[1,2,3],[4,5,6],[7,8,9]])
 # bb = np.array([[1,2,3],[4,5,6],[7,8,9]])
@@ -62,3 +67,6 @@ print(knn_classify(inx=[[170,40]],dataset=gp,label=lb,k=3))
 # ff = np.sum(dd,axis=1)
 # gg = np.sqrt(ff)
 # print(dist(aa,bb))
+
+# x=np.array([[1],[4],[3],[-1],[6],[9]])
+# print(x.argsort(axis=0))
